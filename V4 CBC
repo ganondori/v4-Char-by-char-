@@ -1,0 +1,820 @@
+# Main
+
+using System;
+using System.IO;
+
+namespace Registro_v1
+{
+    class program
+    {
+        static void Main(string[] args)
+        {
+            #region ExternCode
+
+            #endregion
+
+            #region vars
+
+            //VARIABLES
+            
+            string Id, Name, LaName, choice, c1, c2;
+            byte age, X;
+            double money;
+            #endregion
+
+            #region Main
+            while(true){
+                Console.Clear();
+                System.Console.WriteLine("What do you want to do?");
+                System.Console.WriteLine("1) Add");
+                System.Console.WriteLine("2) List");
+                System.Console.WriteLine("3) Search");
+                System.Console.WriteLine("4: Modify");
+                System.Console.WriteLine("5) Delete");
+
+                X = Convert.ToByte(Console.ReadLine());
+                string filePath = args[0];
+                switch (X)
+                {
+                    case 1:
+                    Console.Clear();
+                    System.Console.WriteLine("Write your ID: ");
+                    Id = JustNumbers();
+                    System.Console.WriteLine("Write your Name: ");
+                    Name = JustLetters();
+                    System.Console.WriteLine("Write your LastName: ");
+                    LaName = JustLetters();
+                    System.Console.WriteLine("How old are you? ");
+                    age = Convert.ToByte(JustNumbers());
+                    System.Console.WriteLine("How many money?");
+                    money = Ahorros();
+                    while(true)
+                    {
+                        System.Console.WriteLine("Password");
+                        c1 = Password();
+                        System.Console.WriteLine("Confirm");
+                        c2 = Password();
+                        if(c1 == c2)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            System.Console.WriteLine("Password don't match");
+                        }
+                    }
+
+            
+                    Console.Clear();
+                    System.Console.WriteLine("Do you want to save this info? Y/N");
+                    choice = Console.ReadLine().ToUpper();
+
+                    if(choice == "Y")
+                    {
+                        Persona Anonimo = new Persona (Id,Name,LaName,age,money,c1);
+                        Console.Clear();
+                        Anonimo.show();
+                        System.Console.WriteLine("Is this the information that you want to save? Y/N");
+                        choice = Console.ReadLine().ToUpper();
+
+                        if(choice == "Y")
+                        {
+                            Anonimo.save(filePath);
+                            Console.ReadKey();
+                        }
+                        else if(choice == "N"){}
+                        else 
+                        {
+                        System.Console.WriteLine("The answer is invalid");
+                        Console.ReadKey();
+                        } 
+                    }
+                    
+                    break;
+
+                    case 2:
+                    Console.Clear();
+                    System.Console.WriteLine("LIST");
+                    Stream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                    StreamReader sr = new StreamReader(fs);
+                    System.Console.WriteLine(sr.ReadToEnd());
+                    fs.Close();
+                    sr.Close();
+                    Console.ReadKey();
+                    break;
+
+                    case 3:
+                    Console.Clear();
+                    System.Console.WriteLine("What is the ID?");
+                    Id = Console.ReadLine();
+                    Perss pers = new Perss(Id, filePath);
+                    pers.Search();
+                    Console.ReadKey();
+                    break;
+
+                    case 4:
+                    Console.Clear();
+                    System.Console.WriteLine("What is the ID?");
+                    Id = Console.ReadLine();
+                    Perss perws = new Perss(Id, filePath);
+                    perws.Modify();
+                    Console.ReadKey();
+                    break;
+
+                    case 5:
+                    Console.Clear();
+                    System.Console.WriteLine("What is the ID?");
+                    Id = Console.ReadLine();
+                    Perss perss = new Perss(Id, filePath);
+                    perss.delete();
+                    Console.ReadKey();
+                    break;
+                }
+                System.Console.WriteLine("Do you want to continue? Y/N");
+                choice = Console.ReadLine().ToUpper();
+
+                if(choice == "Y"){}               
+                else if(choice == "N")
+                {
+                    break;
+                }
+                else
+                {
+                    System.Console.WriteLine("The answer is invalid");
+                }
+            }
+            #endregion
+        }
+
+        static string JustNumbers()
+        {
+            ConsoleKey k;
+            string data = "";
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+                int val;
+                bool ex = int.TryParse(inf.KeyChar.ToString(), out val);
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                }
+                else if(!Char.IsControl(inf.KeyChar) && ex)
+                {
+                    Console.Write(inf.KeyChar);
+                    data += inf.KeyChar;
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return data;
+        }
+        static string JustLetters()
+        {
+            ConsoleKey k;
+            string data = "";
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                }
+                else if(!Char.IsControl(inf.KeyChar) && !Char.IsNumber(inf.KeyChar))
+                {
+                    Console.Write(inf.KeyChar);
+                    data += inf.KeyChar;
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return data;
+        }
+        static double Ahorros()
+        {
+            ConsoleKey k;
+            string data = "";
+            int counter = 0;
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+                int val;
+                bool ex = int.TryParse(inf.KeyChar.ToString(), out val);
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                    counter--;
+                }
+                else if(!Char.IsControl(inf.KeyChar) && ex && counter < 3 || Char.IsPunctuation(inf.KeyChar))
+                {
+                    if(counter >= 1)
+                    {
+                        counter++;
+                    }
+                    
+                    Console.Write(inf.KeyChar);
+                    data += inf.KeyChar;
+                    
+
+                    if(Char.IsPunctuation(inf.KeyChar) && counter == 0)
+                    {
+                        counter++;
+                    }
+                    if(counter > 1 && Char.IsPunctuation(inf.KeyChar))
+                    {
+                        Console.Write("\b \b");
+                        data = data.Remove(data.Length - 1);
+                        counter--;
+                    }
+                    
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return Convert.ToDouble(data);
+        }
+        static string Password()
+        {
+            ConsoleKey k;
+            string data = "";
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                }
+                else if(!Char.IsControl(inf.KeyChar))
+                {
+                    Console.Write("*");
+                    data += inf.KeyChar;
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return data;
+        }
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Class1
+
+using System;
+using System.IO;
+
+namespace Registro_v1
+{
+    class Persona
+    {
+        public string ID {get; set;}
+        public string NAME{get;set;}
+        public string LANAME{get;set;}
+        public int AGE{get;set;}
+        public string file{get;set;}
+        public double Money{get; set;}
+        public string password{get; set;}
+
+        public Persona(string id, string name, string Aname, int age, double mone, string Pass)
+        {
+            ID = id;
+            NAME = name;
+            LANAME = Aname;
+            AGE = age;
+            Money = mone;
+            password = Pass;
+        }
+
+
+        public void show()
+        {
+            Persona Anonis = new Persona(ID, NAME, LANAME, AGE, Money, password);
+            Console.Clear();
+            System.Console.WriteLine("ID: " + Anonis.ID);
+            System.Console.WriteLine("Name: " + Anonis.NAME);
+            System.Console.WriteLine("Lastname: " + Anonis.LANAME);
+            System.Console.WriteLine("Age: " + Anonis.AGE);
+            System.Console.WriteLine("Money: " + Anonis.Money);
+            System.Console.WriteLine("Password: " + Anonis.password);
+            System.Console.WriteLine("");
+        }
+
+        public void save(string file)
+        {
+            Stream fs = new FileStream(file,FileMode.Append,FileAccess.Write);
+            StreamWriter writer = new StreamWriter(fs);
+            writer.WriteLine(ID + ", " + NAME + ", " + LANAME + ", " + AGE + ", " + Money + ", " + password);
+            writer.Close();
+            fs.Close();
+            System.Console.WriteLine("Your information has been saved");
+        }
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Class2
+
+using System;
+using System.IO;
+
+namespace Registro_v1
+{
+    class Perss
+    {
+        public string ID{get;set;}
+        public string file{get;set;}
+
+        public Perss(string ced, string fs)
+        {
+            ID = ced;
+            file = fs;
+        }
+
+        public void Search()
+        {
+            
+
+            string chain;
+            string[] camps = new string[6];
+
+
+            Stream fs = new FileStream(file,FileMode.Open,FileAccess.Read);
+            StreamReader sr = new StreamReader(fs);
+
+            chain = sr.ReadLine();
+            while(chain != null)
+            {
+                Console.Clear();
+                camps = chain.Split(',');
+                if(camps[0].Trim().Equals(ID))
+                {
+                    
+                    System.Console.WriteLine(camps[0]);
+                    System.Console.WriteLine(camps[1]);
+                    System.Console.WriteLine(camps[2]);
+                    System.Console.WriteLine(camps[3]);
+                    System.Console.WriteLine(camps[4]);
+                    System.Console.WriteLine(camps[5]);
+
+                    fs.Close();
+                    sr.Close();
+                    break;
+                }
+                else
+                {
+                    System.Console.WriteLine("El usuario no existe");
+                    break;
+                }
+            }
+        }
+
+        public void delete()
+        {
+            string chain, choice;
+            string[] camps = new string[6];
+            StreamReader sr;
+            StreamWriter sw;
+            sr = File.OpenText("datos.txt");
+            sw = File.CreateText("Time.txt");
+            chain = sr.ReadLine();
+
+            while(chain != null)
+            {
+                Console.Clear();
+                camps = chain.Split(',');
+
+                if(camps[0].Trim().Equals(ID))
+                {
+                    
+                    System.Console.WriteLine(camps[0]);
+                    System.Console.WriteLine(camps[1]);
+                    System.Console.WriteLine(camps[2]);
+                    System.Console.WriteLine(camps[3]);
+                    System.Console.WriteLine(camps[4]);
+                    System.Console.WriteLine(camps[5]);
+                    
+                }
+                else 
+                {
+                    sw.WriteLine(chain);
+                }
+                chain = sr.ReadLine();
+ 
+                
+            }
+            sr.Close(); 
+            sw.Close();
+            System.Console.WriteLine("This is the user that you want to delete? Y/N");
+            choice = Console.ReadLine().ToUpper();
+            if(choice =="Y")
+            {
+                File.Delete("datos.txt");
+                File.Move("Time.txt","datos.txt");
+                System.Console.WriteLine("data removed");
+            }
+            else if (choice == "N")
+            {
+                System.Console.WriteLine("Data keeping");
+                Console.ReadKey();
+            }
+            else {System.Console.WriteLine("The answer is invalid");}
+            
+        }
+
+        public void Modify()
+        {
+            string chain, choice, id, Name, Last, c1, c2;
+            double money;
+            byte age;
+            string[] camps = new string[6];
+            StreamReader sr;
+            StreamWriter sw;
+            sr = File.OpenText("datos.txt");
+            sw = File.CreateText("Time.txt");
+            chain = sr.ReadLine();
+
+            while(chain != null)
+            {
+                Console.Clear();
+                camps = chain.Split(',');
+
+                if(camps[0].Trim().Equals(ID))
+                {
+                    System.Console.WriteLine("Data found:");
+                    System.Console.WriteLine("");
+                    System.Console.WriteLine("********************************");
+                    System.Console.WriteLine(camps[0]);
+                    System.Console.WriteLine(camps[1]);
+                    System.Console.WriteLine(camps[2]);
+                    System.Console.WriteLine(camps[3]);
+                    System.Console.WriteLine(camps[4]);
+                    System.Console.WriteLine(camps[5]);
+                    System.Console.WriteLine("********************************");
+                    System.Console.WriteLine("");
+                    System.Console.WriteLine("Do you wan't to modify? Y/N");
+
+                    choice = Console.ReadLine().ToUpper();
+                    if(choice =="Y")
+                    {
+                        Console.Clear();
+                        System.Console.WriteLine("Write the new id");
+                        id = JustNumbers();
+                        System.Console.WriteLine("Write the new name:");
+                        Name = JustLetters();
+                        System.Console.WriteLine("Write the new Lastname");
+                        Last = JustLetters();
+                        System.Console.WriteLine("Write the new age");
+                        age = Convert.ToByte(JustNumbers());
+                        System.Console.WriteLine("Write the new money");
+                        money = Ahorros();
+                        while(true)
+                        {
+                            System.Console.WriteLine("Password");
+                            c1 = Password();
+                            System.Console.WriteLine("Confirm");
+                            c2 = Password();
+                            if(c1 == c2)
+                            {
+                                break;
+                            }
+                                else
+                            {
+                                Console.Clear();
+                                System.Console.WriteLine("Password don't match");
+                            }
+                        }   
+
+
+                        sw.WriteLine(id + ", " + Name + ", " + Last + ", " + age + ", " + money + ", " + c1);
+
+                    }
+                    else if (choice == "N")
+                    {
+                    System.Console.WriteLine("Data keeping");
+                    Console.ReadKey();
+                    }
+                    else {System.Console.WriteLine("The answer is invalid");}
+
+                }
+                else 
+                {
+                    sw.WriteLine(chain);
+                }
+                chain = sr.ReadLine();
+            }
+            sr.Close(); 
+            sw.Close();
+            File.Delete("datos.txt");
+            File.Move("Time.txt","datos.txt");
+            System.Console.WriteLine("data Modified");
+            
+        }
+        static string JustNumbers()
+        {
+            ConsoleKey k;
+            string data = "";
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+                int val;
+                bool ex = int.TryParse(inf.KeyChar.ToString(), out val);
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                }
+                else if(!Char.IsControl(inf.KeyChar) && ex)
+                {
+                    Console.Write(inf.KeyChar);
+                    data += inf.KeyChar;
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return data;
+        }
+        static string JustLetters()
+        {
+            ConsoleKey k;
+            string data = "";
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                }
+                else if(!Char.IsControl(inf.KeyChar) && !Char.IsNumber(inf.KeyChar))
+                {
+                    Console.Write(inf.KeyChar);
+                    data += inf.KeyChar;
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return data;
+        }
+        static double Ahorros()
+        {
+            ConsoleKey k;
+            string data = "";
+            int counter = 0;
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+                int val;
+                bool ex = int.TryParse(inf.KeyChar.ToString(), out val);
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                    counter--;
+                }
+                else if(!Char.IsControl(inf.KeyChar) && ex && counter < 3 || Char.IsPunctuation(inf.KeyChar))
+                {
+                    if(counter >= 1)
+                    {
+                        counter++;
+                    }
+                    
+                    Console.Write(inf.KeyChar);
+                    data += inf.KeyChar;
+                    
+
+                    if(Char.IsPunctuation(inf.KeyChar) && counter == 0)
+                    {
+                        counter++;
+                    }
+                    if(counter > 1 && Char.IsPunctuation(inf.KeyChar))
+                    {
+                        Console.Write("\b \b");
+                        data = data.Remove(data.Length - 1);
+                        counter--;
+                    }
+                    
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return Convert.ToDouble(data);
+        }
+        static string Password()
+        {
+            ConsoleKey k;
+            string data = "";
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                }
+                else if(!Char.IsControl(inf.KeyChar))
+                {
+                    Console.Write("*");
+                    data += inf.KeyChar;
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return data;
+        }
+    }
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#Char by char
+
+using System;
+
+namespace Char_by_char
+{
+    class program
+    {
+        static void Main(string[] args)
+        {
+            Console.Clear();
+            int edad;
+            string Nombre, Apellido, C1, C2;
+            double ahorros;
+
+            System.Console.WriteLine("Cual es su nombre?");
+            Nombre = JL();
+            System.Console.WriteLine("Cual es su apellido?");
+            Apellido = JL();
+            System.Console.WriteLine("Diga su edad");
+            edad = JN();
+            while(true)
+            {
+                System.Console.WriteLine("Digite la clave");
+                C1 = CL();
+                System.Console.WriteLine("Confirme la clave");
+                C2 = CL();
+                if(C1 == C2)
+                {
+                    break;
+                }
+                else
+                {
+                    Console.Clear();
+                    System.Console.WriteLine("Las claves no coinciden");
+                    System.Console.WriteLine("\n");
+                }
+            }
+            System.Console.WriteLine("Diga sus ahorros");
+            ahorros = AH();
+
+            System.Console.WriteLine("Estos son sus datos:");
+            System.Console.WriteLine("*********************************************************************");
+            System.Console.WriteLine("\n");
+            System.Console.WriteLine(Nombre);
+            System.Console.WriteLine(Apellido);
+            System.Console.WriteLine(edad);
+            System.Console.WriteLine(ahorros);
+            System.Console.WriteLine(C1 + " Primera clave");
+            System.Console.WriteLine(C2 + " Segunda clave");
+            System.Console.WriteLine("\n");
+            System.Console.WriteLine("*********************************************************************");
+            Console.ReadKey();
+        }
+        static int JN()
+        {
+            ConsoleKey k;
+            string data = "";
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+                int val;
+                bool ex = int.TryParse(inf.KeyChar.ToString(), out val);
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                }
+                else if(!Char.IsControl(inf.KeyChar) && ex)
+                {
+                    Console.Write(inf.KeyChar);
+                    data += inf.KeyChar;
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return Convert.ToInt32(data);
+        }
+
+        static string JL()
+        {
+            ConsoleKey k;
+            string data = "";
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                }
+                else if(!Char.IsControl(inf.KeyChar) && !Char.IsNumber(inf.KeyChar))
+                {
+                    Console.Write(inf.KeyChar);
+                    data += inf.KeyChar;
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return data;
+        }
+
+        static double AH()
+        {
+            ConsoleKey k;
+            string data = "";
+            int counter = 0;
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+                int val;
+                bool ex = int.TryParse(inf.KeyChar.ToString(), out val);
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                    counter--;
+                }
+                else if(!Char.IsControl(inf.KeyChar) && ex && counter < 3 || Char.IsPunctuation(inf.KeyChar))
+                {
+                    if(counter >= 1)
+                    {
+                        counter++;
+                    }
+                    
+                    Console.Write(inf.KeyChar);
+                    data += inf.KeyChar;
+                    
+
+                    if(Char.IsPunctuation(inf.KeyChar) && counter == 0)
+                    {
+                        counter++;
+                    }
+                    if(counter > 1 && Char.IsPunctuation(inf.KeyChar))
+                    {
+                        Console.Write("\b \b");
+                        data = data.Remove(data.Length - 1);
+                        counter--;
+                    }
+                    
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return Convert.ToDouble(data);
+        }
+        static string CL()
+        {
+            ConsoleKey k;
+            string data = "";
+            do
+            {
+                var inf = Console.ReadKey(true);
+                k = inf.Key;
+
+                if(k == ConsoleKey.Backspace && data.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    data = data.Remove(data.Length - 1);
+                }
+                else if(!Char.IsControl(inf.KeyChar))
+                {
+                    Console.Write("*");
+                    data += inf.KeyChar;
+                }
+            }while(k != ConsoleKey.Enter);
+            System.Console.WriteLine("\n");
+            return data;
+        }
+    }
+}
